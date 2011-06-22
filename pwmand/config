@@ -1,0 +1,15 @@
+# Field layout:
+#	binary 		Full Path will be matched
+#	user/group 	Multiple users or groups allowed. Split with commas (,)
+#			Groups are preceeded by a percentage (%) symbol.
+#	username	The username to hide
+#	password	The password to hide
+# Comments can be done with a hash (#), as seen in this text. 
+# Empty lines are discarded. 
+# The program as it is now can crash if this file is syntactically broken. 
+/home/kevin/pwman/trunk/src/example:kevin:kevin123:h1dd3n
+/home/kevin/pwman/trunk/src/example2:%lpadmin:kevin456:h1dd3n!!
+/home/kevin/pwman/trunk/src/example3:piet,root,%daemon:kevin789:2sj49d
+
+
+
