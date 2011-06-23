@@ -19,7 +19,6 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
@@ -38,6 +37,7 @@ program *list;
 
 // Gracefully shut down. 
 void sigint_handler(int sig) {
+  printf("Received TERM signal, shutting down...\n");
   if (msgctl(msqid, IPC_RMID, NULL) == -1) {
     // Failed to close queue
     perror("msgctl");
@@ -53,7 +53,10 @@ int main() {
   key_t key;
   // Parse the passwd file, and fill the needed struct
   list = (program *)malloc(sizeof(program));
-  parse_passwd_file(list);
+  if(parse_passwd_file(list) == 1) {
+    printf("Can't parse config.\n");
+    exit(1);
+  }
 
   // Catch Ctrl-C / SIGINT to exit the daemon, and close the channel. 
   struct sigaction sa;

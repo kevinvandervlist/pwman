@@ -18,7 +18,6 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,30 +35,87 @@ void init_user(user *);
 void parseLine(program *, char *);
 
 int parse_passwd_file(program *list) {
-  FILE *conf_fd = fopen(CONFIG, "r");
-  char buf[BUFSIZE];
-  init_program(list);
+  // The file size:
+  FILE *conf_fd = fopen(CONFIG, "rb");
+  fseek(conf_fd, 0, SEEK_END);
+  unsigned long length = length = ftell(conf_fd);
+  fseek(conf_fd, 0, SEEK_SET);
+  fclose(conf_fd);
 
-  if(conf_fd != NULL) {
-    program *iter = list;
-    program *prev;
-    while(fgets(buf, sizeof(buf), conf_fd) != NULL) {
-      // Ok, line fetched. 
-      if(!isComment(buf)) {
-	if(iter == NULL) {
-	  iter = (program *)malloc(sizeof(program));
-	  init_program(iter);
-	  prev->next = iter;
-	}
-	parseLine(iter, buf);
-	prev = iter;
-	iter = prev->next;
-      }
+  // malloc memory
+  char *conf = (char *)malloc(sizeof(char) * (length + 1));
+  // init it
+  memset(conf, 0, length+1);
+
+  // Is it crypted?
+  if(CONFIG_CRYPTED == 0) {
+    // Crypted config
+    
+    char *pass_1 = (char*)malloc(sizeof(char) * 128);
+
+    printf("Enter the password to unlock the config: ");
+    gnu_getpass_stdin(pass_1);
+    printf("\n");
+
+    char *hash = (char *)malloc(sizeof(char)*64);
+    char *pass = (char *)malloc(sizeof(char)*32);
+    sha256(pass_1, hash);
+    strncpy(pass, hash, 32);
+
+    decrypt_memory(pass, CONFIG, conf);
+  } else if (CONFIG_CRYPTED == 1) {
+    // Plain text config
+    FILE *conf_fd = fopen(CONFIG, "r");
+
+    if (!conf_fd) {
+      fprintf(stderr, "Can't open config.\n");
+      return 1;
     }
+	
+    fseek(conf_fd, 0, SEEK_END);
+    length = length = ftell(conf_fd);
+    fseek(conf_fd, 0, SEEK_SET);
+
+    if (!conf) {
+      fprintf(stderr, "Can't allocate memory for config.\n");
+      fclose(conf_fd);
+      return 1;
+    }
+
+    fread(conf, length, sizeof(char), conf_fd);
     fclose(conf_fd);
+  } else {
+    printf("Invalid crypt setting.\n");
+    return 1;
+  }
+
+  char buf[BUFSIZE];
+  char c;
+  unsigned int tpos = 0;
+  unsigned int pos = 0;
+
+  program *iter = list;
+  program *prev;
+
+  while(pos < length) {
+    memset(buf, 0, BUFSIZE);
+    while((c = conf[pos++]) != '\n') {
+      buf[tpos++] = c;
+    }
+    tpos = 0;    
+    if(!isComment(buf)) {
+      if(iter == NULL) {
+      iter = (program *)malloc(sizeof(program));
+      init_program(iter);
+      prev->next = iter;
+    }
+    parseLine(iter, buf);
+    prev = iter;
+    iter = prev->next;
+    }
   }
   //passwd_print(list);
-  return 0;
+  free(conf);
 }
 
 void passwd_cleanup(program *p) {

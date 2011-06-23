@@ -22,7 +22,6 @@
 #ifndef LIBPWMAN_H
 #define LIBPWMAN_H
 
-
 // WARNING!!!
 // Changing this requires recompiling pwmand and libpwman
 
@@ -34,7 +33,12 @@
 // Max password length
 #define CREDPASSLEN 256
 // Password file
-#define CONFIG "config"
+#define CONFIG "config.crypted"
+// Crypted config can be created from a normal one with pwmand_encrypt
+// Password of config.crypted = "pwmand"
+// #define CONFIG "config.crypted"
+// Crypted config? 1 == false; 0 == true
+#define CONFIG_CRYPTED 0
 
 // END OF WARNING!!!
 

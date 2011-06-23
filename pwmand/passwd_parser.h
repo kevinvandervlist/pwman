@@ -23,7 +23,7 @@
 #define PASSWD_PARSER_H
 
 // Define
-#define BUFSIZE 1024
+#define BUFSIZE 2048
 
 // user struct info
 struct _user {

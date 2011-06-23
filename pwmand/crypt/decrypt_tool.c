@@ -24,6 +24,7 @@
 
 void usage(const char *bin) {
   printf("Decrypt a config file for pwand\n");
+  printf("It will be printed on stdout\n");
   printf("Usage: %s output\n", bin);
   printf("You will be prompted for a password.\n", bin);
 }
@@ -45,6 +46,6 @@ int main(int argc, char **argv) {
   sha256(pass_1, hash);
   strncpy(pass, hash, 32);
 
-  decrypt(pass, argv[1]);
+  decrypt_stdout(pass, argv[1]);
   return 0;
 }
