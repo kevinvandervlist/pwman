@@ -1,5 +1,5 @@
 /*
-  Decrypt a file.
+  Decrypt a file. Backend code. 
 
   Copyright (C) 2011 Kevin van der Vlist <kevin@kevinvandervlist.nl>
 
