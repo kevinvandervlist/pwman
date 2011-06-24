@@ -49,10 +49,16 @@ int main(int argc, char **argv) {
   } else {
     char *hash = (char *)malloc(sizeof(char)*64);
     char *pass = (char *)malloc(sizeof(char)*32);
+
     sha256(pass_1, hash);
     strncpy(pass, hash, 32);
 
+    free(hash);
     encrypt(pass, argv[1], argv[2]);
+    free(pass);
   }
+  free(pass_1);
+  free(pass_2);
+
   return 0;
 }

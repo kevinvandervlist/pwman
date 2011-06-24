@@ -20,6 +20,54 @@
 
 #include "crypt.h"
 
+unsigned char *buf_crypt;
+unsigned char *buf_plain;
+unsigned char *buf_plain_final;
+
+int buf_plain_len;
+EVP_CIPHER_CTX ctx;
+
+int destptrpos;
+int tempptrpos;
+
+FILE *fd_crypt;
+
+void setup_decrypt(char *passkey, char *file) {
+  // Set the iv
+  memset(iv, 0, IV_SIZE);
+  strcpy(iv, BASE_IV);
+
+  // Set the key
+  memset(key, 0, KEY_SIZE);
+  strcpy(key, passkey);
+
+  // Set the rest of the vars
+  buf_plain_len = BUF_PLAIN_SIZE;
+
+  destptrpos = 0;
+  tempptrpos = 0;
+
+  // init EVP
+  EVP_CIPHER_CTX_init(&ctx);
+  EVP_DecryptInit(&ctx, EVP_aes_256_cbc(), key, iv);
+
+  // Malloc the buffers. 
+  buf_crypt = (unsigned char *) malloc(sizeof(unsigned char) * BUF_CRYPT_SIZE);
+  buf_plain = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
+  buf_plain_final = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
+
+  // Open the crypted file. 
+  fd_crypt = fopen(file, "r");
+}
+
+void cleanup_decrypt() {
+  free(buf_crypt);
+  free(buf_plain);
+  free(buf_plain_final);
+
+  EVP_CIPHER_CTX_cleanup(&ctx);
+}
+
 int decrypt_stdout(char *passkey, char *file) {
   decrypt(passkey, file, stdout);
 }
@@ -30,32 +78,7 @@ int decrypt_path(char *passkey, char *file, char *destfile) {
 }
 
 int decrypt_memory(char *passkey, char *file, char *destptr) {
-  // Set the iv
-  memset(iv, 0, IV_SIZE);
-  strcpy(iv, BASE_IV);
-
-  // Set the key
-  memset(key, 0, KEY_SIZE);
-  strcpy(key, passkey);
-
-  int destptrpos = 0;
-  int tempptrpos = 0;
-  // Set the rest of the vars
-  unsigned char *buf_crypt;
-  unsigned char *buf_plain;
-  unsigned char *buf_plain_final;
-  int buf_plain_len = BUF_PLAIN_SIZE;
-
-  buf_crypt = (unsigned char *) malloc(sizeof(unsigned char) * BUF_CRYPT_SIZE);
-  buf_plain = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
-  buf_plain_final = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
-
-  EVP_CIPHER_CTX ctx;
-  EVP_CIPHER_CTX_init(&ctx);
-  EVP_DecryptInit(&ctx, EVP_aes_256_cbc(), key, iv);
-
-  // Open the crypted file. 
-  FILE *fd_crypt = fopen(file, "r");
+  setup_decrypt(passkey, file);
 
   int n = 0;
   while(1) {
@@ -79,9 +102,8 @@ int decrypt_memory(char *passkey, char *file, char *destptr) {
 
     // We now have a plain text block; copy the decrypted parts
     memcpy(buf_plain_final, buf_plain, buf_plain_len);
-    // buff_plain_final contains the decrypted content
-    //fprintf(dest, "%s", buf_plain_final);
     tempptrpos = 0;
+
     while(tempptrpos < buf_plain_len) {
       destptr[destptrpos++] = buf_plain_final[tempptrpos++];
     }
@@ -95,41 +117,18 @@ int decrypt_memory(char *passkey, char *file, char *destptr) {
   }
   // 
   memcpy(buf_plain_final, buf_plain+buf_plain_len, final_len);
-  // buff_plain_final contains the decrypted content
-  //fprintf(dest, "%s", buf_plain_final);
   tempptrpos = 0;
+
   while(tempptrpos < final_len) {
     destptr[destptrpos++] = buf_plain_final[tempptrpos++];
   }
-  EVP_CIPHER_CTX_cleanup(&ctx);
+
+  cleanup_decrypt();
   return 0;
 }
 
 int decrypt(char *passkey, char *file, FILE *dest) {
-  // Set the iv
-  memset(iv, 0, IV_SIZE);
-  strcpy(iv, BASE_IV);
-
-  // Set the key
-  memset(key, 0, KEY_SIZE);
-  strcpy(key, passkey);
-
-  // Set the rest of the vars
-  unsigned char *buf_crypt;
-  unsigned char *buf_plain;
-  unsigned char *buf_plain_final;
-  int buf_plain_len = BUF_PLAIN_SIZE;
-
-  buf_crypt = (unsigned char *) malloc(sizeof(unsigned char) * BUF_CRYPT_SIZE);
-  buf_plain = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
-  buf_plain_final = (unsigned char *) malloc(sizeof(unsigned char) * BUF_PLAIN_SIZE);
-
-  EVP_CIPHER_CTX ctx;
-  EVP_CIPHER_CTX_init(&ctx);
-  EVP_DecryptInit(&ctx, EVP_aes_256_cbc(), key, iv);
-
-  // Open the crypted file. 
-  FILE *fd_crypt = fopen(file, "r");
+  setup_decrypt(passkey, file);
 
   int n = 0;
   while(1) {
@@ -168,6 +167,6 @@ int decrypt(char *passkey, char *file, FILE *dest) {
   // buff_plain_final contains the decrypted content
   fprintf(dest, "%s", buf_plain_final);
 
-  EVP_CIPHER_CTX_cleanup(&ctx);
+  cleanup_decrypt();
   return 0;
 }

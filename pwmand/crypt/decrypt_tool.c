@@ -46,6 +46,13 @@ int main(int argc, char **argv) {
   sha256(pass_1, hash);
   strncpy(pass, hash, 32);
 
+  // Free pass; hash
+  free(pass_1);
+  free(hash);
+
   decrypt_stdout(pass, argv[1]);
+
+  // Free the pass. 
+  free(pass);
   return 0;
 }

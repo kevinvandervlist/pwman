@@ -63,6 +63,11 @@ int parse_passwd_file(program *list) {
     strncpy(pass, hash, 32);
 
     decrypt_memory(pass, CONFIG, conf);
+    // Free the hash and pass
+    free(hash);
+    free(pass);
+    free(pass_1);
+
   } else if (CONFIG_CRYPTED == 1) {
     // Plain text config
     FILE *conf_fd = fopen(CONFIG, "r");

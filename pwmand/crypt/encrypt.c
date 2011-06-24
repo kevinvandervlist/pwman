@@ -21,7 +21,6 @@
 #include "crypt.h"
 
 int encrypt(char *passkey, char *file, char *dest) {
-
   // Set the iv
   memset(iv, 0, IV_SIZE);
   strcpy(iv, BASE_IV);
@@ -44,7 +43,7 @@ int encrypt(char *passkey, char *file, char *dest) {
   EVP_CIPHER_CTX_init(&ctx);
   EVP_EncryptInit(&ctx, EVP_aes_256_cbc(), key, iv);
 
-  // Open the plain file.
+  // Open the files.
   FILE *fd_plain = fopen(file, "r");
   FILE *fd_crypt = fopen(dest, "wb");
 
@@ -83,5 +82,10 @@ int encrypt(char *passkey, char *file, char *dest) {
   fclose(fd_crypt);
 
   EVP_CIPHER_CTX_cleanup(&ctx);
+
+  free(buf_plain);
+  free(buf_crypt);
+  free(buf_crypt_final);
+
   return 0;
 }
