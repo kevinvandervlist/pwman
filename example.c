@@ -24,7 +24,7 @@
 
 int main() {
   credentials cred;
-  enum pwman_result res = c_getcred(&cred);
+  enum pwman_result res = pwman_getcred(&cred);
   if(res == SUCCESS) {
     printf("Authenticated:\n");
     printf("Username: %s\n", cred.username);

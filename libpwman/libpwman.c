@@ -18,7 +18,6 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +33,7 @@
 // Private
 int getProgramPath(char *name);
 
-enum pwman_result c_getcred(credentials *cred) {
+enum pwman_result pwman_getcred(credentials *cred) {
   enum pwman_result retval = SUCCESS;
   msgbuf msg;
   int msqid;
@@ -102,15 +101,27 @@ enum pwman_result c_getcred(credentials *cred) {
 
 int getProgramPath(char *name) {
   // This ought to be enough
-  //char buf[BINPATHLEN];
   size_t len = readlink("/proc/self/exe", name, (sizeof(char)*BINPATHLEN)-1);
-  //size_t len = readlink("/proc/self/exe", buf, BINPATHLEN);
   if(len != -1) {
     name[len] = '\0';
   } else {
     return 0;
   }
-  //printf("%c::%d\n", buf[len], len);
-  //strcpy(name, buf);
   return 1;
+}
+
+char *pwman_getUser() {
+  credentials cred;
+  enum pwman_result res = pwman_getcred(&cred);
+  char *ret = (char*)malloc(sizeof(char)*strlen(cred.username));
+  strcpy(ret, cred.username);
+  return ret;
+}
+
+char *pwman_getPass() {
+  credentials cred;
+  enum pwman_result res = pwman_getcred(&cred);
+  char *ret = (char*)malloc(sizeof(char)*strlen(cred.password));
+  strcpy(ret, cred.password);
+  return ret;
 }

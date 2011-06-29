@@ -97,6 +97,7 @@ int main() {
     char *p = buf.req.path;
     char *auth_u = buf.rpl.username;
     char *auth_p = buf.rpl.password;
+    printf("Recv'd: %s:%s\n", buf.req.user, buf.req.path);
     passwd_scan(u, p, list, auth_u, auth_p);
     // Reply data, if found
     if(msgsnd(msqid, &buf, sizeof(msgbuf) - sizeof(long), 0) == -1) {

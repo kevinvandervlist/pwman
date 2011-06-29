@@ -33,12 +33,12 @@
 // Max password length
 #define CREDPASSLEN 256
 // Password file
-#define CONFIG "config.crypted"
+#define CONFIG "config"
+//#define CONFIG "config.crypted"
 // Crypted config can be created from a normal one with pwmand_encrypt
 // Password of config.crypted = "pwmand"
-// #define CONFIG "config.crypted"
 // Crypted config? 1 == false; 0 == true
-#define CONFIG_CRYPTED 0
+#define CONFIG_CRYPTED 1
 
 // END OF WARNING!!!
 
@@ -54,7 +54,12 @@ typedef struct _credentials {
 
 // Get credentials (if granted) of appname. 
 // Returns 
-enum pwman_result c_getcred(credentials*);
+enum pwman_result pwman_getcred(credentials*);
+
+// Return the username if the caller is allowed to do so. 
+char *pwman_getUser();
+// Return the password if the caller is allowed to do so. 
+char *pwman_getPass();
 
 enum pwman_result {
   // Succesfull means it's zero
