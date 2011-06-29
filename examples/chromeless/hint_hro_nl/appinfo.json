@@ -1,0 +1,9 @@
+{
+    "build_id": "20110628131023", 
+    "vendor": "Kevin van der Vlist", 
+    "name": "HRO pwmand test", 
+    "developer_email": "kevin@kevinvandervlist.nl", 
+    "module_dirs": [], 
+    "version": "0.1", 
+    "enableSystemPrivileges": true
+}
