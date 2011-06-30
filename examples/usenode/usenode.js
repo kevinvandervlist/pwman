@@ -1,6 +1,16 @@
 // "usenode"; a usenet + pwmand demonstration
-
+// Import the necessary stuff
 var NNTP = require('./nntp'), inspect = require('util').inspect, conn;
+var ffi = require('./lib/ffi');
+
+// Prepare the user 
+var libpwman_u = new ffi.Library("/home/kevin/software/pwman/libpwman/libpwman", { "pwman_getUser": [ "string", [ ] ] });
+
+// And the pass 
+var libpwman_p = new ffi.Library("/home/kevin/software/pwman/libpwman/libpwman", {"pwman_getPass": [ "string", [ ] ] });
+
+console.log(libpwman_u.pwman_getUser()); 
+console.log(libpwman_p.pwman_getPass()); 
 
 function die(e) {
     console.log('Error!');
@@ -8,12 +18,12 @@ function die(e) {
     process.exit(1);
 }
 
-//conn = new NNTPClient({
 conn = new NNTP({
-    host: 'newsreader4.eweka.nl'
+    //host: 'newsreader4.eweka.nl'
+    host: process.argv[2]
 });
 conn.on('connect', function() {
-    conn.auth('user', 'pass', function(e) {
+    conn.auth(libpwman_u.pwman_getUser(), libpwman_p.pwman_getPass(), function(e) {
 	if (e) die(e);
 	doActions();
     });

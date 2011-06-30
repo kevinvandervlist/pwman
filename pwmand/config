@@ -10,4 +10,7 @@
 /home/kevin/software/pwman/examples/minimal_c/example:kevin:kevin123:h1dd3n
 /home/kevin/software/pwman/examples/minimal_c/example2:%lpadmin:kevin456:h1dd3n!!
 /home/kevin/software/pwman/examples/minimal_c/example3:piet,root,%daemon:kevin789:2sj49d
+# This is for the hint demo
 /home/kevin/software/chromeless/build/xulrunner/xulrunner-bin:kevin:0812345:pass
+# This is for the nntp demo
+/home/kevin/nodejs/bin/node:kevin:username:P4ss
