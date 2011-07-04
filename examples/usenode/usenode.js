@@ -9,9 +9,6 @@ var libpwman_u = new ffi.Library("/home/kevin/software/pwman/libpwman/libpwman",
 // And the pass 
 var libpwman_p = new ffi.Library("/home/kevin/software/pwman/libpwman/libpwman", {"pwman_getPass": [ "string", [ ] ] });
 
-console.log(libpwman_u.pwman_getUser()); 
-console.log(libpwman_p.pwman_getPass()); 
-
 function die(e) {
     console.log('Error!');
     console.error(e);
